@@ -247,106 +247,106 @@ class TradeVisualizer:
         return fig
     
     def plot_pnl_distribution(self, save_path: Optional[str] = None):
-        """绘制盈亏分布图"""
+        """Plot P&L distribution chart"""
         if 'closed_pnl' not in self.data.columns:
-            self.logger.error("没有盈亏数据")
+            self.logger.error("No P&L data available")
             return None
         
         fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 10))
         
         pnl_data = self.data['closed_pnl'].dropna()
         
-        # 盈亏直方图
+        # P&L histogram
         ax1.hist(pnl_data, bins=30, alpha=0.7, color='skyblue', edgecolor='black')
-        ax1.axvline(pnl_data.mean(), color='red', linestyle='--', label=f'均值: {pnl_data.mean():.4f}')
-        ax1.axvline(pnl_data.median(), color='green', linestyle='--', label=f'中位数: {pnl_data.median():.4f}')
-        ax1.set_xlabel('盈亏')
-        ax1.set_ylabel('频次')
-        ax1.set_title('盈亏分布直方图')
+        ax1.axvline(pnl_data.mean(), color='red', linestyle='--', label=f'Mean: {pnl_data.mean():.4f}')
+        ax1.axvline(pnl_data.median(), color='green', linestyle='--', label=f'Median: {pnl_data.median():.4f}')
+        ax1.set_xlabel('P&L')
+        ax1.set_ylabel('Frequency')
+        ax1.set_title('P&L Distribution Histogram')
         ax1.legend()
         ax1.grid(True, alpha=0.3)
         
-        # 盈亏箱型图
+        # P&L box plot
         ax2.boxplot(pnl_data, vert=True)
-        ax2.set_ylabel('盈亏')
-        ax2.set_title('盈亏箱型图')
+        ax2.set_ylabel('P&L')
+        ax2.set_title('P&L Box Plot')
         ax2.grid(True, alpha=0.3)
         
-        # 累积盈亏按时间分布
+        # Cumulative P&L by time distribution
         if 'hour' in self.data.columns:
             hourly_pnl = self.data.groupby('hour')['closed_pnl'].sum()
             ax3.bar(hourly_pnl.index, hourly_pnl.values, alpha=0.7, color='lightcoral')
-            ax3.set_xlabel('小时')
-            ax3.set_ylabel('累积盈亏')
-            ax3.set_title('按小时累积盈亏分布')
+            ax3.set_xlabel('Hour')
+            ax3.set_ylabel('Cumulative P&L')
+            ax3.set_title('Cumulative P&L by Hour')
             ax3.grid(True, alpha=0.3)
         
-        # 胜负交易对比
+        # Win/Loss trade comparison
         win_trades = pnl_data[pnl_data > 0]
         loss_trades = pnl_data[pnl_data < 0]
         
-        categories = ['盈利交易', '亏损交易']
+        categories = ['Profit Trades', 'Loss Trades']
         values = [len(win_trades), len(loss_trades)]
         colors = ['green', 'red']
         
         ax4.pie(values, labels=categories, colors=colors, autopct='%1.1f%%', startangle=90)
-        ax4.set_title('盈亏交易占比')
+        ax4.set_title('Win/Loss Trade Ratio')
         
         plt.tight_layout()
         
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
-            self.logger.info(f"图表已保存到: {save_path}")
+            self.logger.info(f"Chart saved to: {save_path}")
         
         return fig
     
     def plot_trading_frequency(self, save_path: Optional[str] = None):
-        """绘制交易频率分析图"""
+        """Plot trading frequency analysis chart"""
         if 'date' not in self.data.columns:
-            self.logger.error("没有日期数据")
+            self.logger.error("No date data available")
             return None
         
         fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 10))
         
-        # 按小时分布
+        # By hour distribution
         if 'hour' in self.data.columns:
             hourly_counts = self.data['hour'].value_counts().sort_index()
         else:
             hourly_counts = self.data['date'].dt.hour.value_counts().sort_index()
         
         ax1.bar(hourly_counts.index, hourly_counts.values, alpha=0.7, color='skyblue')
-        ax1.set_xlabel('小时')
-        ax1.set_ylabel('交易次数')
-        ax1.set_title('按小时交易频率分布')
+        ax1.set_xlabel('Hour')
+        ax1.set_ylabel('Trade Count')
+        ax1.set_title('Trading Frequency by Hour')
         ax1.grid(True, alpha=0.3)
         
-        # 按星期分布
+        # By week distribution
         if 'day_of_week' in self.data.columns:
             weekly_counts = self.data['day_of_week'].value_counts()
         else:
             weekly_counts = self.data['date'].dt.day_name().value_counts()
         
         ax2.bar(weekly_counts.index, weekly_counts.values, alpha=0.7, color='lightgreen')
-        ax2.set_xlabel('星期')
-        ax2.set_ylabel('交易次数')
-        ax2.set_title('按星期交易频率分布')
+        ax2.set_xlabel('Day of Week')
+        ax2.set_ylabel('Trade Count')
+        ax2.set_title('Trading Frequency by Day of Week')
         ax2.tick_params(axis='x', rotation=45)
         ax2.grid(True, alpha=0.3)
         
-        # 按日期交易次数
+        # Daily trade count
         daily_counts = self.data['date'].dt.date.value_counts().sort_index()
         ax3.plot(daily_counts.index, daily_counts.values, marker='o', markersize=3, alpha=0.7)
-        ax3.set_xlabel('日期')
-        ax3.set_ylabel('交易次数')
-        ax3.set_title('每日交易次数趋势')
+        ax3.set_xlabel('Date')
+        ax3.set_ylabel('Trade Count')
+        ax3.set_title('Daily Trade Count Trend')
         ax3.tick_params(axis='x', rotation=45)
         ax3.grid(True, alpha=0.3)
         
-        # 交易类型分布
+        # Trade type distribution
         if 'trade_type' in self.data.columns:
             type_counts = self.data['trade_type'].value_counts()
             ax4.pie(type_counts.values, labels=type_counts.index, autopct='%1.1f%%', startangle=90)
-            ax4.set_title('交易类型分布')
+            ax4.set_title('Trade Type Distribution')
         
         plt.tight_layout()
         
@@ -457,38 +457,38 @@ class TradeVisualizer:
             colors = ['green', 'red', 'gray']
             
             ax.pie(values, labels=categories, colors=colors, autopct='%1.1f%%', startangle=90)
-            ax.set_title('盈亏交易占比')
+            ax.set_title('Win/Loss Trade Ratio')
         
         plt.tight_layout()
         
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
-            self.logger.info(f"仪表板已保存到: {save_path}")
+            self.logger.info(f"Dashboard saved to: {save_path}")
         
         return fig
     
     def save_all_charts(self, output_dir: str = "charts"):
-        """保存所有图表到指定目录"""
+        """Save all charts to specified directory"""
         import os
         
-        # 创建输出目录
+        # Create output directory
         os.makedirs(output_dir, exist_ok=True)
         
         charts = {
-            "盈亏曲线": self.plot_pnl_curve,
-            "价格走势": self.plot_price_chart,
-            "盈亏分布": self.plot_pnl_distribution,
-            "交易频率": self.plot_trading_frequency,
-            "持仓分析": self.plot_position_analysis,
-            "综合仪表板": self.create_dashboard
+            "P&L Curve": self.plot_pnl_curve,
+            "Price Trend": self.plot_price_chart,
+            "P&L Distribution": self.plot_pnl_distribution,
+            "Trading Frequency": self.plot_trading_frequency,
+            "Position Analysis": self.plot_position_analysis,
+            "Comprehensive Dashboard": self.create_dashboard
         }
         
         for name, func in charts.items():
             try:
                 save_path = os.path.join(output_dir, f"{name}.png")
                 func(save_path=save_path)
-                self.logger.info(f"已生成图表: {name}")
+                self.logger.info(f"Generated chart: {name}")
             except Exception as e:
-                self.logger.error(f"生成图表失败 {name}: {e}")
+                self.logger.error(f"Failed to generate chart {name}: {e}")
         
-        self.logger.info(f"所有图表已保存到目录: {output_dir}") 
+        self.logger.info(f"All charts saved to directory: {output_dir}") 
