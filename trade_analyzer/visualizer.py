@@ -13,9 +13,11 @@ from plotly.subplots import make_subplots
 from typing import Dict, List, Optional, Tuple
 import logging
 
-# 设置中文字体
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Arial Unicode MS', 'DejaVu Sans']
-plt.rcParams['axes.unicode_minus'] = False
+# 设置中文字体（仅在非测试环境中）
+import os
+if not os.environ.get('TESTING'):
+    plt.rcParams['font.sans-serif'] = ['SimHei', 'Arial Unicode MS', 'DejaVu Sans']
+    plt.rcParams['axes.unicode_minus'] = False
 
 class TradeVisualizer:
     """交易数据可视化器"""

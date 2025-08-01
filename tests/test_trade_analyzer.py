@@ -90,7 +90,10 @@ class TestTradeAnalyzer:
     
     def test_pnl_statistics(self):
         """测试盈亏统计"""
-        analyzer = TradeAnalyzer(self.sample_data)
+        # 先标准化数据
+        processor = TradeDataProcessor()
+        standardized_data = processor._standardize_data(self.sample_data)
+        analyzer = TradeAnalyzer(standardized_data)
         stats = analyzer.calculate_pnl_statistics()
         
         # 检查返回的统计信息（使用中文键名）
@@ -107,7 +110,10 @@ class TestTradeAnalyzer:
     
     def test_risk_metrics(self):
         """测试风险指标"""
-        analyzer = TradeAnalyzer(self.sample_data)
+        # 先标准化数据
+        processor = TradeDataProcessor()
+        standardized_data = processor._standardize_data(self.sample_data)
+        analyzer = TradeAnalyzer(standardized_data)
         risk_metrics = analyzer.calculate_risk_metrics()
         
         # 检查风险指标（使用中文键名）
