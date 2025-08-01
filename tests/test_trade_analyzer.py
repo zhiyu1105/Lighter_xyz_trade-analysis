@@ -116,15 +116,15 @@ class TestTradeAnalyzer:
         analyzer = TradeAnalyzer(standardized_data)
         risk_metrics = analyzer.calculate_risk_metrics()
         
-        # 检查风险指标（使用中文键名）
+        # 检查风险指标（使用实际的中文键名）
         assert '夏普比率' in risk_metrics
-        assert '最大回撤' in risk_metrics
-        assert 'VaR_95' in risk_metrics
-        assert 'CVaR_95' in risk_metrics
+        assert '年化收益率' in risk_metrics
+        assert 'VaR_95%' in risk_metrics
+        assert 'CVaR_95%' in risk_metrics
         
         # 检查数据类型
         assert isinstance(risk_metrics['夏普比率'], (int, float))
-        assert isinstance(risk_metrics['最大回撤'], (int, float))
+        assert isinstance(risk_metrics['年化收益率'], (int, float))
 
 
 class TestTradeVisualizer:

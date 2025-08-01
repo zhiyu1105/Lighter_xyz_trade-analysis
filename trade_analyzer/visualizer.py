@@ -16,8 +16,12 @@ import logging
 # 设置中文字体（仅在非测试环境中）
 import os
 if not os.environ.get('TESTING'):
-    plt.rcParams['font.sans-serif'] = ['SimHei', 'Arial Unicode MS', 'DejaVu Sans']
-    plt.rcParams['axes.unicode_minus'] = False
+    try:
+        plt.rcParams['font.sans-serif'] = ['SimHei', 'Arial Unicode MS', 'DejaVu Sans']
+        plt.rcParams['axes.unicode_minus'] = False
+    except:
+        # 如果字体设置失败，使用默认字体
+        pass
 
 class TradeVisualizer:
     """交易数据可视化器"""
