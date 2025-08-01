@@ -47,18 +47,19 @@ class TestTradeDataProcessor:
     def test_data_cleaning(self):
         """测试数据清洗功能"""
         processor = TradeDataProcessor()
-        cleaned_data = processor.clean_data(self.sample_data)
+        # 使用 _standardize_data 方法（内部方法）
+        cleaned_data = processor._standardize_data(self.sample_data)
         
         # 检查数据类型
         assert isinstance(cleaned_data, pd.DataFrame)
-        assert 'Date' in cleaned_data.columns
-        assert 'Closed PnL' in cleaned_data.columns
+        assert 'date' in cleaned_data.columns  # 标准化后列名变为小写
+        assert 'closed_pnl' in cleaned_data.columns
         
         # 检查日期格式
-        assert pd.api.types.is_datetime64_any_dtype(cleaned_data['Date'])
+        assert pd.api.types.is_datetime64_any_dtype(cleaned_data['date'])
         
         # 检查数值类型
-        assert pd.api.types.is_numeric_dtype(cleaned_data['Closed PnL'])
+        assert pd.api.types.is_numeric_dtype(cleaned_data['closed_pnl'])
 
 
 class TestTradeAnalyzer:
@@ -67,7 +68,7 @@ class TestTradeAnalyzer:
     def setup_method(self):
         """设置测试数据"""
         self.sample_data = pd.DataFrame({
-            'Date': pd.date_range('2025-01-01', periods=100, freq='H'),
+            'Date': pd.date_range('2025-01-01', periods=100, freq='h'),
             'Closed PnL': np.random.normal(10, 20, 100),
             'Market': ['BTC'] * 100,
             'Side': np.random.choice(['Long', 'Short'], 100),
@@ -92,32 +93,32 @@ class TestTradeAnalyzer:
         analyzer = TradeAnalyzer(self.sample_data)
         stats = analyzer.calculate_pnl_statistics()
         
-        # 检查返回的统计信息
-        assert 'total_pnl' in stats
-        assert 'win_rate' in stats
-        assert 'profit_factor' in stats
-        assert 'max_profit' in stats
-        assert 'max_loss' in stats
+        # 检查返回的统计信息（使用中文键名）
+        assert '总盈亏' in stats
+        assert '胜率' in stats
+        assert '盈亏比' in stats
+        assert '最大单笔盈利' in stats
+        assert '最大单笔亏损' in stats
         
         # 检查数据类型
-        assert isinstance(stats['total_pnl'], (int, float))
-        assert isinstance(stats['win_rate'], (int, float))
-        assert 0 <= stats['win_rate'] <= 100
+        assert isinstance(stats['总盈亏'], (int, float))
+        assert isinstance(stats['胜率'], (int, float))
+        assert 0 <= stats['胜率'] <= 100
     
     def test_risk_metrics(self):
         """测试风险指标"""
         analyzer = TradeAnalyzer(self.sample_data)
         risk_metrics = analyzer.calculate_risk_metrics()
         
-        # 检查风险指标
-        assert 'sharpe_ratio' in risk_metrics
-        assert 'max_drawdown' in risk_metrics
-        assert 'var_95' in risk_metrics
-        assert 'cvar_95' in risk_metrics
+        # 检查风险指标（使用中文键名）
+        assert '夏普比率' in risk_metrics
+        assert '最大回撤' in risk_metrics
+        assert 'VaR_95' in risk_metrics
+        assert 'CVaR_95' in risk_metrics
         
         # 检查数据类型
-        assert isinstance(risk_metrics['sharpe_ratio'], (int, float))
-        assert isinstance(risk_metrics['max_drawdown'], (int, float))
+        assert isinstance(risk_metrics['夏普比率'], (int, float))
+        assert isinstance(risk_metrics['最大回撤'], (int, float))
 
 
 class TestTradeVisualizer:
@@ -126,7 +127,7 @@ class TestTradeVisualizer:
     def setup_method(self):
         """设置测试数据"""
         self.sample_data = pd.DataFrame({
-            'Date': pd.date_range('2025-01-01', periods=50, freq='H'),
+            'Date': pd.date_range('2025-01-01', periods=50, freq='h'),
             'Closed PnL': np.random.normal(10, 15, 50),
             'Market': ['BTC'] * 50,
             'Side': np.random.choice(['Long', 'Short'], 50),
@@ -144,7 +145,11 @@ class TestTradeVisualizer:
     
     def test_plot_pnl_curve(self):
         """测试盈亏曲线图"""
-        visualizer = TradeVisualizer(self.sample_data)
+        # 添加累积盈亏列
+        test_data = self.sample_data.copy()
+        test_data['cumulative_pnl'] = test_data['Closed PnL'].cumsum()
+        
+        visualizer = TradeVisualizer(test_data)
         fig = visualizer.plot_pnl_curve()
         
         # 检查返回的图表对象
@@ -156,7 +161,7 @@ def test_integration():
     """集成测试"""
     # 创建测试数据
     test_data = pd.DataFrame({
-        'Date': pd.date_range('2025-01-01', periods=20, freq='H'),
+        'Date': pd.date_range('2025-01-01', periods=20, freq='h'),
         'Closed PnL': [10, -5, 15, -8, 12, -3, 20, -10, 8, -6,
                        15, -7, 12, -4, 18, -9, 11, -5, 14, -8],
         'Market': ['BTC'] * 20,
@@ -171,21 +176,23 @@ def test_integration():
     try:
         # 数据处理
         processor = TradeDataProcessor()
-        cleaned_data = processor.clean_data(test_data)
+        cleaned_data = processor._standardize_data(test_data)
         
         # 数据分析
         analyzer = TradeAnalyzer(cleaned_data)
         pnl_stats = analyzer.calculate_pnl_statistics()
         risk_metrics = analyzer.calculate_risk_metrics()
         
-        # 数据可视化
-        visualizer = TradeVisualizer(cleaned_data)
+        # 数据可视化（添加累积盈亏列）
+        viz_data = cleaned_data.copy()
+        viz_data['cumulative_pnl'] = cleaned_data['closed_pnl'].cumsum()
+        visualizer = TradeVisualizer(viz_data)
         fig = visualizer.plot_pnl_curve()
         
         # 基本断言
         assert len(cleaned_data) == 20
-        assert 'total_pnl' in pnl_stats
-        assert 'sharpe_ratio' in risk_metrics
+        assert '总盈亏' in pnl_stats
+        assert '夏普比率' in risk_metrics
         assert fig is not None
         
     except Exception as e:
