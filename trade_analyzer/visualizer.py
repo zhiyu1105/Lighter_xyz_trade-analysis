@@ -1,6 +1,6 @@
 """
-交易数据可视化模块
-负责生成各种图表和可视化分析
+Trading Data Visualization Module
+Responsible for generating various charts and visualization analysis
 """
 
 import pandas as pd
@@ -13,31 +13,31 @@ from plotly.subplots import make_subplots
 from typing import Dict, List, Optional, Tuple
 import logging
 
-# 设置中文字体（仅在非测试环境中）
+# Set font (only in non-testing environment)
 import os
 if not os.environ.get('TESTING'):
     try:
-        plt.rcParams['font.sans-serif'] = ['SimHei', 'Arial Unicode MS', 'DejaVu Sans']
+        plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'DejaVu Sans']
         plt.rcParams['axes.unicode_minus'] = False
     except:
-        # 如果字体设置失败，使用默认字体
+        # If font setting fails, use default font
         pass
 
 class TradeVisualizer:
-    """交易数据可视化器"""
+    """Trading Data Visualizer"""
     
     def __init__(self, data: pd.DataFrame):
         self.data = data
         self.logger = logging.getLogger(__name__)
         
-        # 设置绘图样式
+        # Set plotting style
         sns.set_style("whitegrid")
         plt.style.use('seaborn-v0_8-darkgrid')
     
     def plot_pnl_curve(self, save_path: Optional[str] = None, interactive: bool = False):
-        """绘制盈亏曲线"""
+        """Plot P&L curve"""
         if 'cumulative_pnl' not in self.data.columns:
-            self.logger.error("没有累积盈亏数据")
+            self.logger.error("No cumulative P&L data available")
             return None
         
         if interactive:
@@ -46,22 +46,22 @@ class TradeVisualizer:
             return self._plot_pnl_curve_matplotlib(save_path)
     
     def _plot_pnl_curve_matplotlib(self, save_path: Optional[str] = None):
-        """使用matplotlib绘制盈亏曲线"""
+        """Plot P&L curve using matplotlib"""
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
         
-        # 累积盈亏曲线
+        # Cumulative P&L curve
         if 'date' in self.data.columns:
             ax1.plot(self.data['date'], self.data['cumulative_pnl'], linewidth=2, color='blue')
-            ax1.set_xlabel('日期')
+            ax1.set_xlabel('Date')
         else:
             ax1.plot(self.data.index, self.data['cumulative_pnl'], linewidth=2, color='blue')
-            ax1.set_xlabel('交易序号')
+            ax1.set_xlabel('Trade Sequence')
         
-        ax1.set_ylabel('累积盈亏')
-        ax1.set_title('累积盈亏曲线', fontsize=14, fontweight='bold')
+        ax1.set_ylabel('Cumulative P&L')
+        ax1.set_title('Cumulative P&L Curve', fontsize=14, fontweight='bold')
         ax1.grid(True, alpha=0.3)
         
-        # 回撤图
+        # Drawdown chart
         if 'cumulative_pnl' in self.data.columns:
             running_max = self.data['cumulative_pnl'].expanding().max()
             drawdown = self.data['cumulative_pnl'] - running_max
@@ -69,48 +69,48 @@ class TradeVisualizer:
             if 'date' in self.data.columns:
                 ax2.fill_between(self.data['date'], drawdown, 0, alpha=0.3, color='red')
                 ax2.plot(self.data['date'], drawdown, color='red', linewidth=1)
-                ax2.set_xlabel('日期')
+                ax2.set_xlabel('Date')
             else:
                 ax2.fill_between(self.data.index, drawdown, 0, alpha=0.3, color='red')
                 ax2.plot(self.data.index, drawdown, color='red', linewidth=1)
-                ax2.set_xlabel('交易序号')
+                ax2.set_xlabel('Trade Sequence')
             
-            ax2.set_ylabel('回撤')
-            ax2.set_title('回撤图', fontsize=14, fontweight='bold')
+            ax2.set_ylabel('Drawdown')
+            ax2.set_title('Drawdown Chart', fontsize=14, fontweight='bold')
             ax2.grid(True, alpha=0.3)
         
         plt.tight_layout()
         
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
-            self.logger.info(f"图表已保存到: {save_path}")
+            self.logger.info(f"Chart saved to: {save_path}")
         
         return fig
     
     def _plot_pnl_curve_plotly(self):
-        """使用plotly绘制交互式盈亏曲线"""
+        """Plot interactive P&L curve using plotly"""
         fig = make_subplots(
             rows=2, cols=1,
-            subplot_titles=('累积盈亏曲线', '回撤图'),
+            subplot_titles=('Cumulative P&L Curve', 'Drawdown Chart'),
             vertical_spacing=0.08
         )
         
-        # 准备x轴数据
+        # Prepare x-axis data
         x_data = self.data['date'] if 'date' in self.data.columns else self.data.index
         
-        # 累积盈亏曲线
+        # Cumulative P&L curve
         fig.add_trace(
             go.Scatter(
                 x=x_data,
                 y=self.data['cumulative_pnl'],
                 mode='lines',
-                name='累积盈亏',
+                name='Cumulative P&L',
                 line=dict(color='blue', width=2)
             ),
             row=1, col=1
         )
         
-        # 回撤图
+        # Drawdown chart
         if 'cumulative_pnl' in self.data.columns:
             running_max = self.data['cumulative_pnl'].expanding().max()
             drawdown = self.data['cumulative_pnl'] - running_max
@@ -120,7 +120,7 @@ class TradeVisualizer:
                     x=x_data,
                     y=drawdown,
                     mode='lines',
-                    name='回撤',
+                    name='Drawdown',
                     fill='tonexty',
                     line=dict(color='red', width=1),
                     fillcolor='rgba(255,0,0,0.3)'
@@ -129,7 +129,7 @@ class TradeVisualizer:
             )
         
         fig.update_layout(
-            title='交易盈亏分析',
+            title='Trading P&L Analysis',
             height=700,
             showlegend=True
         )
@@ -137,9 +137,9 @@ class TradeVisualizer:
         return fig
     
     def plot_price_chart(self, save_path: Optional[str] = None, interactive: bool = False):
-        """绘制价格走势图"""
+        """Plot price trend chart"""
         if 'price' not in self.data.columns:
-            self.logger.error("没有价格数据")
+            self.logger.error("No price data available")
             return None
         
         if interactive:
@@ -148,34 +148,34 @@ class TradeVisualizer:
             return self._plot_price_chart_matplotlib(save_path)
     
     def _plot_price_chart_matplotlib(self, save_path: Optional[str] = None):
-        """使用matplotlib绘制价格走势图"""
+        """Plot price trend chart using matplotlib"""
         fig, ax = plt.subplots(figsize=(12, 6))
         
         x_data = self.data['date'] if 'date' in self.data.columns else self.data.index
         
-        # 价格曲线
-        ax.plot(x_data, self.data['price'], linewidth=1, color='black', alpha=0.7, label='价格')
+        # Price curve
+        ax.plot(x_data, self.data['price'], linewidth=1, color='black', alpha=0.7, label='Price')
         
-        # 移动平均线
+        # Moving average
         if 'price_ma_10' in self.data.columns:
-            ax.plot(x_data, self.data['price_ma_10'], linewidth=2, color='orange', label='10期移动平均')
+            ax.plot(x_data, self.data['price_ma_10'], linewidth=2, color='orange', label='10-period MA')
         
-        # 标记交易点
+        # Mark trade points
         if 'trade_type' in self.data.columns:
             open_trades = self.data[self.data['trade_type'] == 'Open']
             close_trades = self.data[self.data['trade_type'] == 'Close']
             
             if len(open_trades) > 0:
                 open_x = open_trades['date'] if 'date' in self.data.columns else open_trades.index
-                ax.scatter(open_x, open_trades['price'], color='green', marker='^', s=50, label='开仓', alpha=0.8)
+                ax.scatter(open_x, open_trades['price'], color='green', marker='^', s=50, label='Open', alpha=0.8)
             
             if len(close_trades) > 0:
                 close_x = close_trades['date'] if 'date' in self.data.columns else close_trades.index
-                ax.scatter(close_x, close_trades['price'], color='red', marker='v', s=50, label='平仓', alpha=0.8)
+                ax.scatter(close_x, close_trades['price'], color='red', marker='v', s=50, label='Close', alpha=0.8)
         
-        ax.set_xlabel('时间')
-        ax.set_ylabel('价格')
-        ax.set_title('价格走势与交易点', fontsize=14, fontweight='bold')
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Price')
+        ax.set_title('Price Trend with Trade Points', fontsize=14, fontweight='bold')
         ax.legend()
         ax.grid(True, alpha=0.3)
         
@@ -183,7 +183,7 @@ class TradeVisualizer:
         
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
-            self.logger.info(f"图表已保存到: {save_path}")
+            self.logger.info(f"Chart saved to: {save_path}")
         
         return fig
     
@@ -364,12 +364,12 @@ class TradeVisualizer:
         
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
         
-        # 持仓变化分布
+        # Position change distribution
         position_counts = self.data['position_change'].value_counts()
         ax1.bar(position_counts.index, position_counts.values, alpha=0.7, color='orange')
-        ax1.set_xlabel('持仓变化类型')
-        ax1.set_ylabel('次数')
-        ax1.set_title('持仓变化分布')
+        ax1.set_xlabel('Position Change Type')
+        ax1.set_ylabel('Count')
+        ax1.set_title('Position Change Distribution')
         ax1.tick_params(axis='x', rotation=45)
         ax1.grid(True, alpha=0.3)
         
@@ -378,9 +378,9 @@ class TradeVisualizer:
             position_pnl = self.data.groupby('position_change')['closed_pnl'].sum()
             colors = ['green' if x > 0 else 'red' for x in position_pnl.values]
             ax2.bar(position_pnl.index, position_pnl.values, alpha=0.7, color=colors)
-            ax2.set_xlabel('持仓变化类型')
-            ax2.set_ylabel('累积盈亏')
-            ax2.set_title('各持仓方向累积盈亏')
+            ax2.set_xlabel('Position Change Type')
+            ax2.set_ylabel('Cumulative P&L')
+            ax2.set_title('Cumulative P&L by Position Direction')
             ax2.tick_params(axis='x', rotation=45)
             ax2.grid(True, alpha=0.3)
         
@@ -393,58 +393,58 @@ class TradeVisualizer:
         return fig
     
     def create_dashboard(self, save_path: Optional[str] = None):
-        """创建综合仪表板"""
+        """Create comprehensive dashboard"""
         fig, axes = plt.subplots(3, 2, figsize=(20, 15))
-        fig.suptitle('交易分析综合仪表板', fontsize=16, fontweight='bold')
+        fig.suptitle('Trading Analysis Comprehensive Dashboard', fontsize=16, fontweight='bold')
         
-        # 1. 累积盈亏曲线
+        # 1. Cumulative P&L curve
         ax = axes[0, 0]
         if 'cumulative_pnl' in self.data.columns:
             x_data = self.data['date'] if 'date' in self.data.columns else self.data.index
             ax.plot(x_data, self.data['cumulative_pnl'], linewidth=2, color='blue')
-            ax.set_title('累积盈亏曲线')
-            ax.set_ylabel('累积盈亏')
+            ax.set_title('Cumulative P&L Curve')
+            ax.set_ylabel('Cumulative P&L')
             ax.grid(True, alpha=0.3)
         
-        # 2. 盈亏分布直方图
+        # 2. P&L distribution histogram
         ax = axes[0, 1]
         if 'closed_pnl' in self.data.columns:
             pnl_data = self.data['closed_pnl'].dropna()
             ax.hist(pnl_data, bins=20, alpha=0.7, color='skyblue', edgecolor='black')
-            ax.axvline(pnl_data.mean(), color='red', linestyle='--', label=f'均值: {pnl_data.mean():.4f}')
-            ax.set_title('盈亏分布')
-            ax.set_xlabel('盈亏')
-            ax.set_ylabel('频次')
+            ax.axvline(pnl_data.mean(), color='red', linestyle='--', label=f'Mean: {pnl_data.mean():.4f}')
+            ax.set_title('P&L Distribution')
+            ax.set_xlabel('P&L')
+            ax.set_ylabel('Frequency')
             ax.legend()
             ax.grid(True, alpha=0.3)
         
-        # 3. 价格走势
+        # 3. Price trend
         ax = axes[1, 0]
         if 'price' in self.data.columns:
             x_data = self.data['date'] if 'date' in self.data.columns else self.data.index
             ax.plot(x_data, self.data['price'], linewidth=1, color='black', alpha=0.7)
-            ax.set_title('价格走势')
-            ax.set_ylabel('价格')
+            ax.set_title('Price Trend')
+            ax.set_ylabel('Price')
             ax.grid(True, alpha=0.3)
         
-        # 4. 交易频率（按小时）
+        # 4. Trading frequency (by hour)
         ax = axes[1, 1]
         if 'hour' in self.data.columns:
             hourly_counts = self.data['hour'].value_counts().sort_index()
             ax.bar(hourly_counts.index, hourly_counts.values, alpha=0.7, color='lightgreen')
-            ax.set_title('按小时交易频率')
-            ax.set_xlabel('小时')
-            ax.set_ylabel('交易次数')
+            ax.set_title('Trading Frequency by Hour')
+            ax.set_xlabel('Hour')
+            ax.set_ylabel('Trade Count')
             ax.grid(True, alpha=0.3)
         
-        # 5. 持仓分布
+        # 5. Position distribution
         ax = axes[2, 0]
         if 'position_change' in self.data.columns:
             position_counts = self.data['position_change'].value_counts()
             ax.pie(position_counts.values, labels=position_counts.index, autopct='%1.1f%%', startangle=90)
-            ax.set_title('持仓变化分布')
+            ax.set_title('Position Change Distribution')
         
-        # 6. 胜负交易对比
+        # 6. Win/Loss trade comparison
         ax = axes[2, 1]
         if 'closed_pnl' in self.data.columns:
             pnl_data = self.data['closed_pnl'].dropna()
@@ -452,7 +452,7 @@ class TradeVisualizer:
             loss_trades = len(pnl_data[pnl_data < 0])
             equal_trades = len(pnl_data[pnl_data == 0])
             
-            categories = ['盈利', '亏损', '平局']
+            categories = ['Profit', 'Loss', 'Break-even']
             values = [win_trades, loss_trades, equal_trades]
             colors = ['green', 'red', 'gray']
             

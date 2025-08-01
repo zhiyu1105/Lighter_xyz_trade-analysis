@@ -11,7 +11,7 @@ setup(
     version="1.0.0",
     author="TradeAnalysis Team",
     author_email="your.email@example.com",
-    description="一个功能强大、易于使用的交易数据分析工具",
+    description="A powerful and easy-to-use trading data analysis tool",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/zhiyu1105/Lighter_xyz_trade-analysis",

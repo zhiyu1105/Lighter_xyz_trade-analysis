@@ -96,17 +96,17 @@ class TestTradeAnalyzer:
         analyzer = TradeAnalyzer(standardized_data)
         stats = analyzer.calculate_pnl_statistics()
         
-        # 检查返回的统计信息（使用中文键名）
-        assert '总盈亏' in stats
-        assert '胜率' in stats
-        assert '盈亏比' in stats
-        assert '最大单笔盈利' in stats
-        assert '最大单笔亏损' in stats
+        # Check returned statistics (using English key names)
+        assert 'total_pnl' in stats
+        assert 'win_rate' in stats
+        assert 'profit_factor' in stats
+        assert 'max_profit' in stats
+        assert 'max_loss' in stats
         
-        # 检查数据类型
-        assert isinstance(stats['总盈亏'], (int, float))
-        assert isinstance(stats['胜率'], (int, float))
-        assert 0 <= stats['胜率'] <= 100
+        # Check data types
+        assert isinstance(stats['total_pnl'], (int, float))
+        assert isinstance(stats['win_rate'], (int, float))
+        assert 0 <= stats['win_rate'] <= 100
     
     def test_risk_metrics(self):
         """测试风险指标"""
@@ -116,15 +116,15 @@ class TestTradeAnalyzer:
         analyzer = TradeAnalyzer(standardized_data)
         risk_metrics = analyzer.calculate_risk_metrics()
         
-        # 检查风险指标（使用实际的中文键名）
-        assert '夏普比率' in risk_metrics
-        assert '年化收益率' in risk_metrics
-        assert 'VaR_95%' in risk_metrics
-        assert 'CVaR_95%' in risk_metrics
+        # Check risk metrics (using actual English key names)
+        assert 'sharpe_ratio' in risk_metrics
+        assert 'annualized_return' in risk_metrics
+        assert 'var_95_percent' in risk_metrics
+        assert 'cvar_95_percent' in risk_metrics
         
-        # 检查数据类型
-        assert isinstance(risk_metrics['夏普比率'], (int, float))
-        assert isinstance(risk_metrics['年化收益率'], (int, float))
+        # Check data types
+        assert isinstance(risk_metrics['sharpe_ratio'], (int, float))
+        assert isinstance(risk_metrics['annualized_return'], (int, float))
 
 
 class TestTradeVisualizer:
@@ -197,8 +197,8 @@ def test_integration():
         
         # 基本断言
         assert len(cleaned_data) == 20
-        assert '总盈亏' in pnl_stats
-        assert '夏普比率' in risk_metrics
+        assert 'total_pnl' in pnl_stats
+        assert 'sharpe_ratio' in risk_metrics
         assert fig is not None
         
     except Exception as e:

@@ -135,9 +135,9 @@ def main():
     
     # 检查 README.md 是否包含关键信息
     readme_checks = [
-        "交易数据分析",
-        "快速开始",
-        "安装依赖",
+        "trading data analysis",
+        "Quick Start",
+        "Install Dependencies",
         "streamlit run app.py"
     ]
     if not check_file_content("README.md", readme_checks, "README.md 包含关键信息"):

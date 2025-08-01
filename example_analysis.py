@@ -127,11 +127,11 @@ def main():
             print("❌ 不支持的文件格式，请使用CSV或Excel文件")
             return
         
-        print(f"✅ 成功加载数据: {len(data)} 行记录")
-        print(f"📊 数据列: {list(data.columns)}")
+        print(f"✅ Successfully loaded data: {len(data)} rows")
+        print(f"📊 Data columns: {list(data.columns)}")
         
-        # 显示数据摘要
-        print("\n📋 数据摘要:")
+        # Display data summary
+        print("\n📋 Data Summary:")
         summary = processor.get_data_summary()
         for key, value in summary.items():
             if isinstance(value, dict):
@@ -141,12 +141,12 @@ def main():
             else:
                 print(f"  {key}: {value}")
         
-        # 2. 交易分析
-        print("\n📈 步骤2: 交易绩效分析")
+        # 2. Trading analysis
+        print("\n📈 Step 2: Trading Performance Analysis")
         analyzer = TradeAnalyzer(data)
         
-        # 盈亏分析
-        print("\n💰 盈亏分析:")
+        # P&L analysis
+        print("\n💰 P&L Analysis:")
         pnl_stats = analyzer.calculate_pnl_statistics()
         for key, value in pnl_stats.items():
             if isinstance(value, float):
@@ -154,8 +154,8 @@ def main():
             else:
                 print(f"  {key}: {value}")
         
-        # 回撤分析
-        print("\n📉 回撤分析:")
+        # Drawdown analysis
+        print("\n📉 Drawdown Analysis:")
         drawdown_stats = analyzer.calculate_drawdown()
         for key, value in drawdown_stats.items():
             if isinstance(value, float):
@@ -163,8 +163,8 @@ def main():
             else:
                 print(f"  {key}: {value}")
         
-        # 风险指标
-        print("\n⚠️ 风险指标:")
+        # Risk metrics
+        print("\n⚠️ Risk Metrics:")
         risk_metrics = analyzer.calculate_risk_metrics()
         for key, value in risk_metrics.items():
             if isinstance(value, float):
@@ -172,105 +172,105 @@ def main():
             else:
                 print(f"  {key}: {value}")
         
-        # 交易频率分析
-        print("\n⏰ 交易频率分析:")
+        # Trading frequency analysis
+        print("\n⏰ Trading Frequency Analysis:")
         freq_stats = analyzer.analyze_trading_frequency()
         for key, value in freq_stats.items():
             if not isinstance(value, dict):
                 print(f"  {key}: {value}")
         
-        # 最佳和最差交易
-        print("\n🏆 最佳和最差交易:")
+        # Best and worst trades
+        print("\n🏆 Best and Worst Trades:")
         best_worst = analyzer.find_best_worst_trades(3)
         
-        print("  最佳交易:")
-        for i, trade in enumerate(best_worst.get("最佳交易", []), 1):
-            print(f"    {i}. 日期: {trade.get('date')}, 盈亏: {trade.get('closed_pnl'):.4f}")
+        print("  Best trades:")
+        for i, trade in enumerate(best_worst.get("best_trades", []), 1):
+            print(f"    {i}. Date: {trade.get('date')}, P&L: {trade.get('closed_pnl'):.4f}")
         
-        print("  最差交易:")
-        for i, trade in enumerate(best_worst.get("最差交易", []), 1):
-            print(f"    {i}. 日期: {trade.get('date')}, 盈亏: {trade.get('closed_pnl'):.4f}")
+        print("  Worst trades:")
+        for i, trade in enumerate(best_worst.get("worst_trades", []), 1):
+            print(f"    {i}. Date: {trade.get('date')}, P&L: {trade.get('closed_pnl'):.4f}")
         
-        # 3. 可视化分析
-        print("\n📊 步骤3: 生成可视化图表")
+        # 3. Visualization analysis
+        print("\n📊 Step 3: Generate Visualization Charts")
         visualizer = TradeVisualizer(data)
         
-        # 创建图表输出目录
+        # Create charts output directory
         charts_dir = "analysis_charts"
         os.makedirs(charts_dir, exist_ok=True)
         
-        # 生成所有图表
-        print(f"  正在生成图表到目录: {charts_dir}")
+        # Generate all charts
+        print(f"  Generating charts to directory: {charts_dir}")
         visualizer.save_all_charts(charts_dir)
         
-        # 4. 生成综合报告
-        print("\n📑 步骤4: 生成综合报告")
+        # 4. Generate comprehensive report
+        print("\n📑 Step 4: Generate Comprehensive Report")
         report = analyzer.generate_performance_report()
         
-        # 保存JSON报告
+        # Save JSON report
         report_filename = f"trade_analysis_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(report_filename, 'w', encoding='utf-8') as f:
             json.dump(report, f, ensure_ascii=False, indent=2, default=str)
         
-        print(f"✅ 综合报告已保存: {report_filename}")
+        print(f"✅ Comprehensive report saved: {report_filename}")
         
-        # 5. 显示关键结论
-        print("\n🎯 关键结论:")
+        # 5. Display key conclusions
+        print("\n🎯 Key Conclusions:")
         print("=" * 30)
         
-        # 绩效总结
-        total_pnl = pnl_stats.get("总盈亏", 0)
-        win_rate = pnl_stats.get("胜率", 0)
-        profit_loss_ratio = pnl_stats.get("盈亏比", 0)
-        max_drawdown = drawdown_stats.get("最大回撤金额", 0)
-        sharpe_ratio = risk_metrics.get("夏普比率", 0)
+        # Performance summary
+        total_pnl = pnl_stats.get("total_pnl", 0)
+        win_rate = pnl_stats.get("win_rate", 0)
+        profit_loss_ratio = pnl_stats.get("profit_factor", 0)
+        max_drawdown = drawdown_stats.get("max_drawdown_amount", 0)
+        sharpe_ratio = risk_metrics.get("sharpe_ratio", 0)
         
-        print(f"📊 交易绩效:")
-        print(f"  • 总盈亏: {total_pnl:.4f}")
-        print(f"  • 胜率: {win_rate:.2f}%")
-        print(f"  • 盈亏比: {profit_loss_ratio:.2f}")
-        print(f"  • 最大回撤: {max_drawdown:.4f}")
-        print(f"  • 夏普比率: {sharpe_ratio:.4f}")
+        print(f"📊 Trading Performance:")
+        print(f"  • Total P&L: {total_pnl:.4f}")
+        print(f"  • Win Rate: {win_rate:.2f}%")
+        print(f"  • Profit Factor: {profit_loss_ratio:.2f}")
+        print(f"  • Max Drawdown: {max_drawdown:.4f}")
+        print(f"  • Sharpe Ratio: {sharpe_ratio:.4f}")
         
-        # 绩效评估
-        print(f"\n🏅 绩效评估:")
+        # Performance assessment
+        print(f"\n🏅 Performance Assessment:")
         if total_pnl > 0:
-            print("  ✅ 总体盈利")
+            print("  ✅ Overall profitable")
         else:
-            print("  ❌ 总体亏损")
+            print("  ❌ Overall loss")
         
         if win_rate > 50:
-            print("  ✅ 胜率超过50%")
+            print("  ✅ Win rate above 50%")
         else:
-            print("  ⚠️ 胜率低于50%")
+            print("  ⚠️ Win rate below 50%")
         
         if profit_loss_ratio > 1:
-            print("  ✅ 盈亏比大于1")
+            print("  ✅ Profit factor above 1")
         else:
-            print("  ⚠️ 盈亏比小于1")
+            print("  ⚠️ Profit factor below 1")
         
         if sharpe_ratio > 1:
-            print("  ✅ 夏普比率优秀")
+            print("  ✅ Excellent Sharpe ratio")
         elif sharpe_ratio > 0.5:
-            print("  🔶 夏普比率良好")
+            print("  🔶 Good Sharpe ratio")
         else:
-            print("  ⚠️ 夏普比率需要改善")
+            print("  ⚠️ Sharpe ratio needs improvement")
         
-        # 交易建议
-        print(f"\n💡 交易建议:")
+        # Trading recommendations
+        print(f"\n💡 Trading Recommendations:")
         if win_rate < 40:
-            print("  • 考虑改进交易策略，提高胜率")
+            print("  • Consider improving trading strategy to increase win rate")
         if profit_loss_ratio < 1:
-            print("  • 建议优化止盈止损比例，提高盈亏比")
+            print("  • Suggest optimizing profit/loss ratio to improve profit factor")
         if abs(max_drawdown) > total_pnl * 0.2:
-            print("  • 注意风险控制，回撤过大")
-        if freq_stats.get("平均每日交易次数", 0) > 20:
-            print("  • 交易频率较高，注意交易成本")
+            print("  • Pay attention to risk control, drawdown is too large")
+        if freq_stats.get("average_daily_trades", 0) > 20:
+            print("  • High trading frequency, pay attention to trading costs")
         
-        print(f"\n🎉 分析完成！")
-        print(f"📁 图表文件夹: {charts_dir}")
-        print(f"📄 报告文件: {report_filename}")
-        print(f"📝 日志文件: trade_analysis.log")
+        print(f"\n🎉 Analysis completed!")
+        print(f"📁 Charts folder: {charts_dir}")
+        print(f"📄 Report file: {report_filename}")
+        print(f"📝 Log file: trade_analysis.log")
         
     except Exception as e:
         print(f"❌ 分析过程中发生错误: {e}")
@@ -301,10 +301,10 @@ def analyze_custom_file(file_path: str):
         summary = processor.get_data_summary()
         pnl_stats = analyzer.calculate_pnl_statistics()
         
-        print(f"✅ 文件分析完成")
-        print(f"📊 交易笔数: {summary.get('总交易笔数', 'N/A')}")
-        print(f"💰 总盈亏: {summary.get('总盈亏', 'N/A')}")
-        print(f"🎯 胜率: {pnl_stats.get('胜率', 'N/A'):.2f}%")
+        print(f"✅ File analysis completed")
+        print(f"📊 Trade count: {summary.get('total_trades', 'N/A')}")
+        print(f"💰 Total P&L: {summary.get('total_pnl', 'N/A')}")
+        print(f"🎯 Win rate: {pnl_stats.get('win_rate', 'N/A'):.2f}%")
         
     except Exception as e:
         print(f"❌ 分析失败: {e}")

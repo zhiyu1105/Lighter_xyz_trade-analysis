@@ -1,6 +1,6 @@
 """
-交易分析网页应用
-基于Streamlit的用户界面
+Trading Analysis Web Application
+Streamlit-based user interface
 streamlit run app.py
 """
 
@@ -16,29 +16,29 @@ import glob
 
 from trade_analyzer import TradeDataProcessor, TradeAnalyzer, TradeVisualizer
 
-# 配置页面
+# Configure page
 st.set_page_config(
-    page_title="交易数据分析平台",
+    page_title="Trading Data Analysis Platform",
     page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# 设置日志
+# Set up logging
 logging.basicConfig(level=logging.INFO)
 
 def get_data_files():
-    """获取data文件夹中的可用数据文件"""
+    """Get available data files from data folder"""
     data_dir = "data"
     if not os.path.exists(data_dir):
         return []
     
     files = []
-    # 查找CSV文件
+    # Find CSV files
     csv_files = glob.glob(os.path.join(data_dir, "*.csv"))
     files.extend(csv_files)
     
-    # 查找Excel文件
+    # Find Excel files
     excel_files = glob.glob(os.path.join(data_dir, "*.xlsx"))
     excel_files.extend(glob.glob(os.path.join(data_dir, "*.xls")))
     files.extend(excel_files)
@@ -46,41 +46,41 @@ def get_data_files():
     return sorted(files)
 
 def main():
-    st.title("📈 交易数据分析平台")
+    st.title("📈 Trading Data Analysis Platform")
     st.markdown("---")
     
-    # 侧边栏
+    # Sidebar
     with st.sidebar:
-        st.header("功能菜单")
+        st.header("Function Menu")
         
-        # 数据选择
-        st.subheader("📁 数据选择")
+        # Data selection
+        st.subheader("📁 Data Selection")
         
-        # 获取data文件夹中的文件
+        # Get files from data folder
         data_files = get_data_files()
         
         if data_files:
-            st.write("📂 数据文件夹中的文件：")
+            st.write("📂 Files in data folder:")
             selected_file = st.selectbox(
-                "选择数据文件",
+                "Select data file",
                 data_files,
                 format_func=lambda x: os.path.basename(x)
             )
             
-            if st.button("📊 分析选中文件"):
+            if st.button("📊 Analyze selected file"):
                 st.session_state['selected_file'] = selected_file
                 st.session_state['analysis_ready'] = True
                 st.rerun()
         else:
-            st.warning("📁 data文件夹中没有找到数据文件")
-            st.info("请将你的交易数据文件放入data文件夹中")
+            st.warning("📁 No data files found in data folder")
+            st.info("Please place your trading data files in the data folder")
         
-        # 文件上传
-        st.subheader("📤 上传新文件")
+        # File upload
+        st.subheader("📤 Upload new file")
         uploaded_file = st.file_uploader(
-            "选择交易数据文件",
+            "Select trading data file",
             type=['csv', 'xlsx', 'xls'],
-            help="支持CSV和Excel格式"
+            help="Supports CSV and Excel formats"
         )
         
         if uploaded_file is not None:
@@ -88,36 +88,36 @@ def main():
             st.session_state['analysis_ready'] = True
             st.rerun()
         
-        # 分析选项
-        st.subheader("📊 分析选项")
+        # Analysis options
+        st.subheader("📊 Analysis Options")
         analysis_type = st.selectbox(
-            "选择分析类型",
-            ["概览分析", "盈亏分析", "风险分析", "交易频率分析", "持仓分析", "可视化分析"]
+            "Select analysis type",
+            ["Overview Analysis", "P&L Analysis", "Risk Analysis", "Trading Frequency Analysis", "Position Analysis", "Visualization Analysis"]
         )
         
-        # 图表选项
-        st.subheader("📈 图表选项")
-        chart_interactive = st.checkbox("交互式图表", value=True, help="使用Plotly生成交互式图表")
+        # Chart options
+        st.subheader("📈 Chart Options")
+        chart_interactive = st.checkbox("Interactive charts", value=True, help="Use Plotly to generate interactive charts")
         
-        # 数据管理
-        st.subheader("🗂️ 数据管理")
-        if st.button("📂 打开数据文件夹"):
+        # Data management
+        st.subheader("🗂️ Data Management")
+        if st.button("📂 Open data folder"):
             data_dir = os.path.abspath("data")
-            st.info(f"数据文件夹路径：{data_dir}")
+            st.info(f"Data folder path: {data_dir}")
             st.code(f"open {data_dir}")
     
-    # 主内容区
+    # Main content area
     if 'analysis_ready' in st.session_state and st.session_state['analysis_ready']:
         try:
-            # 数据处理
+            # Data processing
             processor = TradeDataProcessor()
             
-            # 确定数据源
+            # Determine data source
             if 'selected_file' in st.session_state:
-                # 使用data文件夹中的文件
+                # Use file from data folder
                 file_path = st.session_state['selected_file']
                 file_name = os.path.basename(file_path)
-                st.success(f"📁 正在分析文件：{file_name}")
+                st.success(f"📁 Analyzing file: {file_name}")
                 
                 if file_path.endswith('.csv'):
                     data = processor.load_csv(file_path)
@@ -125,236 +125,236 @@ def main():
                     data = processor.load_excel(file_path)
                     
             elif 'uploaded_file' in st.session_state:
-                # 使用上传的文件
+                # Use uploaded file
                 uploaded_file = st.session_state['uploaded_file']
-                st.success(f"📤 正在分析上传文件：{uploaded_file.name}")
+                st.success(f"📤 Analyzing uploaded file: {uploaded_file.name}")
                 
-                # 保存上传的文件到临时位置
+                # Save uploaded file to temporary location
                 with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_file.name)[1]) as tmp_file:
                     tmp_file.write(uploaded_file.getvalue())
                     tmp_file_path = tmp_file.name
                 
-                # 加载数据
+                # Load data
                 if uploaded_file.name.endswith('.csv'):
                     data = processor.load_csv(tmp_file_path)
                 else:
                     data = processor.load_excel(tmp_file_path)
                 
-                # 清理临时文件
+                # Clean up temporary file
                 os.unlink(tmp_file_path)
             else:
-                st.error("没有选择数据文件")
+                st.error("No data file selected")
                 return
             
-            # 显示数据概览
-            st.header("📋 数据概览")
+            # Display data overview
+            st.header("📋 Data Overview")
             col1, col2, col3 = st.columns(3)
             
             with col1:
-                st.metric("总交易笔数", len(data))
+                st.metric("Total Trades", len(data))
             with col2:
                 if 'closed_pnl' in data.columns:
                     total_pnl = data['closed_pnl'].sum()
-                    st.metric("总盈亏", f"{total_pnl:.4f}")
+                    st.metric("Total P&L", f"{total_pnl:.4f}")
                 else:
-                    st.metric("总盈亏", "N/A")
+                    st.metric("Total P&L", "N/A")
             with col3:
                 if 'date' in data.columns:
                     date_range = (data['date'].max() - data['date'].min()).days
-                    st.metric("数据天数", f"{date_range}天")
+                    st.metric("Data Days", f"{date_range} days")
                 else:
-                    st.metric("数据天数", "N/A")
+                    st.metric("Data Days", "N/A")
             
-            # 显示数据样本
-            st.subheader("数据样本")
+            # Display data sample
+            st.subheader("Data Sample")
             st.dataframe(data.head(10), use_container_width=True)
             
-            # 数据摘要
+            # Data summary
             summary = processor.get_data_summary()
-            with st.expander("查看详细数据摘要"):
+            with st.expander("View detailed data summary"):
                 st.json(summary)
             
-            # 分析器和可视化器
+            # Analyzer and visualizer
             analyzer = TradeAnalyzer(data)
             visualizer = TradeVisualizer(data)
             
             st.markdown("---")
             
-            # 根据选择的分析类型显示内容
-            if analysis_type == "概览分析":
+            # Display content based on selected analysis type
+            if analysis_type == "Overview Analysis":
                 show_overview_analysis(analyzer, data)
                 
-            elif analysis_type == "盈亏分析":
+            elif analysis_type == "P&L Analysis":
                 show_pnl_analysis(analyzer, visualizer, chart_interactive)
                 
-            elif analysis_type == "风险分析":
+            elif analysis_type == "Risk Analysis":
                 show_risk_analysis(analyzer, visualizer, chart_interactive)
                 
-            elif analysis_type == "交易频率分析":
+            elif analysis_type == "Trading Frequency Analysis":
                 show_frequency_analysis(analyzer, visualizer, chart_interactive)
                 
-            elif analysis_type == "持仓分析":
+            elif analysis_type == "Position Analysis":
                 show_position_analysis(analyzer, visualizer, chart_interactive)
                 
-            elif analysis_type == "可视化分析":
+            elif analysis_type == "Visualization Analysis":
                 show_visualization_analysis(visualizer, chart_interactive)
             
-            # 生成综合报告
+            # Generate comprehensive report
             st.markdown("---")
-            st.header("📑 综合报告")
-            if st.button("生成完整分析报告"):
-                with st.spinner("正在生成报告..."):
+            st.header("📑 Comprehensive Report")
+            if st.button("Generate complete analysis report"):
+                with st.spinner("Generating report..."):
                     report = analyzer.generate_performance_report()
                     
-                    # 显示报告
-                    st.subheader("交易绩效综合报告")
+                    # Display report
+                    st.subheader("Trading Performance Comprehensive Report")
                     
-                    # 基本信息
-                    st.write("**报告基本信息**")
-                    st.json(report["数据概览"])
+                    # Basic information
+                    st.write("**Report Basic Information**")
+                    st.json(report["Data Overview"])
                     
-                    # 主要指标
+                    # Main metrics
                     col1, col2 = st.columns(2)
                     
                     with col1:
-                        st.write("**盈亏分析**")
-                        st.json(report["盈亏分析"])
+                        st.write("**P&L Analysis**")
+                        st.json(report["P&L Analysis"])
                         
-                        st.write("**交易频率分析**")
-                        st.json(report["交易频率分析"])
+                        st.write("**Trading Frequency Analysis**")
+                        st.json(report["Trading Frequency Analysis"])
                     
                     with col2:
-                        st.write("**回撤分析**")
-                        st.json(report["回撤分析"])
+                        st.write("**Drawdown Analysis**")
+                        st.json(report["Drawdown Analysis"])
                         
-                        st.write("**风险指标**")
-                        st.json(report["风险指标"])
+                        st.write("**Risk Metrics**")
+                        st.json(report["Risk Metrics"])
                     
-                    # 下载报告
+                    # Download report
                     report_json = json.dumps(report, ensure_ascii=False, indent=2, default=str)
                     st.download_button(
-                        label="📥 下载JSON报告",
+                        label="📥 Download JSON Report",
                         data=report_json,
                         file_name=f"trade_analysis_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
                         mime="application/json"
                     )
             
         except Exception as e:
-            st.error(f"数据处理错误: {e}")
-            st.error("请检查文件格式是否正确，确保包含必要的列（如Date, Closed PnL等）")
+            st.error(f"Data processing error: {e}")
+            st.error("Please check if the file format is correct and contains necessary columns (such as Date, Closed PnL, etc.)")
     
     else:
-        # 显示使用说明
-        st.header("🚀 使用说明")
+        # Display usage instructions
+        st.header("🚀 Usage Instructions")
         
-        # 检查data文件夹
+        # Check data folder
         data_files = get_data_files()
         if data_files:
-            st.success(f"✅ 在data文件夹中找到 {len(data_files)} 个数据文件")
-            st.write("**可用文件：**")
+            st.success(f"✅ Found {len(data_files)} data files in data folder")
+            st.write("**Available files:**")
             for file in data_files:
                 st.write(f"- {os.path.basename(file)}")
         else:
-            st.warning("⚠️ data文件夹中没有找到数据文件")
-            st.info("请将你的交易数据文件放入data文件夹中")
+            st.warning("⚠️ No data files found in data folder")
+            st.info("Please place your trading data files in the data folder")
         
         st.markdown("""
-        ### 欢迎使用交易数据分析平台！
+        ### Welcome to the Trading Data Analysis Platform!
         
-        #### 📊 功能特色
-        - **数据导入**: 支持CSV和Excel格式的交易数据
-        - **全面分析**: 提供盈亏、风险、频率、持仓等多维度分析
-        - **可视化**: 丰富的图表展示，支持交互式图表
-        - **报告生成**: 一键生成综合分析报告
+        #### 📊 Feature Highlights
+        - **Data Import**: Supports CSV and Excel format trading data
+        - **Comprehensive Analysis**: Provides P&L, risk, frequency, position and other multi-dimensional analysis
+        - **Visualization**: Rich chart display with interactive chart support
+        - **Report Generation**: One-click comprehensive analysis report generation
         
-        #### 📁 数据格式要求
-        你的交易数据文件应包含以下列（列名不区分大小写）：
+        #### 📁 Data Format Requirements
+        Your trading data file should contain the following columns (column names are case-insensitive):
         
-        | 列名 | 说明 | 必需 |
-        |------|------|------|
-        | Market | 市场/品种 | 可选 |
-        | Side | 交易方向 | 可选 |
-        | Date | 交易日期时间 | **必需** |
-        | Trade Value | 交易价值 | 可选 |
-        | Size | 交易数量 | 可选 |
-        | Price | 交易价格 | 可选 |
-        | Closed PnL | 已实现盈亏 | **必需** |
-        | Fee | 手续费 | 可选 |
-        | Role | 角色(Maker/Taker) | 可选 |
+        | Column Name | Description | Required |
+        |-------------|-------------|----------|
+        | Market | Market/Instrument | Optional |
+        | Side | Trade Direction | Optional |
+        | Date | Trade Date/Time | **Required** |
+        | Trade Value | Trade Value | Optional |
+        | Size | Trade Size | Optional |
+        | Price | Trade Price | Optional |
+        | Closed PnL | Realized P&L | **Required** |
+        | Fee | Transaction Fee | Optional |
+        | Role | Role (Maker/Taker) | Optional |
         
-        #### 🎯 使用步骤
-        1. **放置数据**: 将交易数据文件放入data文件夹
-        2. **选择文件**: 在左侧选择要分析的数据文件
-        3. **选择分析**: 选择你感兴趣的分析类型
-        4. **查看结果**: 浏览分析结果和图表
-        5. **生成报告**: 点击生成完整分析报告
+        #### 🎯 Usage Steps
+        1. **Place Data**: Put trading data files in the data folder
+        2. **Select File**: Choose the data file to analyze from the left sidebar
+        3. **Choose Analysis**: Select the analysis type you're interested in
+        4. **View Results**: Browse analysis results and charts
+        5. **Generate Report**: Click to generate complete analysis report
         
-        #### 💡 提示
-        - 数据量大时加载可能需要几秒钟
-        - 交互式图表支持缩放、平移等操作
-        - 可以下载生成的分析报告供后续使用
-        - 支持多个数据文件进行对比分析
+        #### 💡 Tips
+        - Loading may take a few seconds for large datasets
+        - Interactive charts support zoom, pan and other operations
+        - You can download generated analysis reports for later use
+        - Supports comparison analysis of multiple data files
         """)
 
 def show_overview_analysis(analyzer, data):
-    """显示概览分析"""
-    st.header("📋 概览分析")
+    """Display overview analysis"""
+    st.header("📋 Overview Analysis")
     
-    # 基本统计
+    # Basic statistics
     col1, col2, col3, col4 = st.columns(4)
     
     if 'closed_pnl' in data.columns:
         pnl_stats = analyzer.calculate_pnl_statistics()
         
         with col1:
-            st.metric("胜率", f"{pnl_stats.get('胜率', 0):.2f}%")
+            st.metric("Win Rate", f"{pnl_stats.get('win_rate', 0):.2f}%")
         with col2:
-            st.metric("盈亏比", f"{pnl_stats.get('盈亏比', 0):.2f}")
+            st.metric("Profit Factor", f"{pnl_stats.get('profit_factor', 0):.2f}")
         with col3:
-            st.metric("最大盈利", f"{pnl_stats.get('最大单笔盈利', 0):.4f}")
+            st.metric("Max Profit", f"{pnl_stats.get('max_profit', 0):.4f}")
         with col4:
-            st.metric("最大亏损", f"{pnl_stats.get('最大单笔亏损', 0):.4f}")
+            st.metric("Max Loss", f"{pnl_stats.get('max_loss', 0):.4f}")
     
-    # 最佳和最差交易
+    # Best and worst trades
     best_worst = analyzer.find_best_worst_trades(5)
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("🏆 最佳交易（前5）")
-        if "最佳交易" in best_worst:
-            st.dataframe(pd.DataFrame(best_worst["最佳交易"]))
+        st.subheader("🏆 Best Trades (Top 5)")
+        if "best_trades" in best_worst:
+            st.dataframe(pd.DataFrame(best_worst["best_trades"]))
     
     with col2:
-        st.subheader("😞 最差交易（前5）")
-        if "最差交易" in best_worst:
-            st.dataframe(pd.DataFrame(best_worst["最差交易"]))
+        st.subheader("😞 Worst Trades (Top 5)")
+        if "worst_trades" in best_worst:
+            st.dataframe(pd.DataFrame(best_worst["worst_trades"]))
 
 def show_pnl_analysis(analyzer, visualizer, interactive):
-    """显示盈亏分析"""
-    st.header("💰 盈亏分析")
+    """Display P&L analysis"""
+    st.header("💰 P&L Analysis")
     
-    # 盈亏统计
+    # P&L statistics
     pnl_stats = analyzer.calculate_pnl_statistics()
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.subheader("基本统计")
+        st.subheader("Basic Statistics")
         st.json(pnl_stats)
     
     with col2:
-        st.subheader("回撤分析")
+        st.subheader("Drawdown Analysis")
         drawdown_stats = analyzer.calculate_drawdown()
         st.json(drawdown_stats)
     
     with col3:
-        st.subheader("交易规模")
+        st.subheader("Trade Size Analysis")
         size_stats = analyzer.analyze_trade_sizes()
         st.json(size_stats)
     
-    # 盈亏曲线图
-    st.subheader("📈 盈亏曲线")
+    # P&L curve chart
+    st.subheader("📈 P&L Curve")
     fig = visualizer.plot_pnl_curve(interactive=interactive)
     if fig:
         if interactive:
@@ -362,101 +362,101 @@ def show_pnl_analysis(analyzer, visualizer, interactive):
         else:
             st.pyplot(fig)
     
-    # 盈亏分布图
-    st.subheader("📊 盈亏分布")
+    # P&L distribution chart
+    st.subheader("📊 P&L Distribution")
     fig = visualizer.plot_pnl_distribution()
     if fig:
         st.pyplot(fig)
 
 def show_risk_analysis(analyzer, visualizer, interactive):
-    """显示风险分析"""
-    st.header("⚠️ 风险分析")
+    """Display risk analysis"""
+    st.header("⚠️ Risk Analysis")
     
     risk_metrics = analyzer.calculate_risk_metrics()
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("风险指标")
+        st.subheader("Risk Metrics")
         st.json(risk_metrics)
     
     with col2:
-        st.subheader("风险评估")
+        st.subheader("Risk Assessment")
         
-        # 根据指标给出评估
-        sharpe = risk_metrics.get("夏普比率", 0)
-        max_dd = risk_metrics.get("最大回撤百分比", 0)
+        # Provide assessment based on metrics
+        sharpe = risk_metrics.get("sharpe_ratio", 0)
+        max_dd = risk_metrics.get("max_drawdown_percentage", 0)
         
         if sharpe > 1:
-            st.success(f"夏普比率 {sharpe:.2f} - 风险调整后收益良好")
+            st.success(f"Sharpe Ratio {sharpe:.2f} - Good risk-adjusted returns")
         elif sharpe > 0.5:
-            st.warning(f"夏普比率 {sharpe:.2f} - 风险调整后收益一般")
+            st.warning(f"Sharpe Ratio {sharpe:.2f} - Average risk-adjusted returns")
         else:
-            st.error(f"夏普比率 {sharpe:.2f} - 风险调整后收益较差")
+            st.error(f"Sharpe Ratio {sharpe:.2f} - Poor risk-adjusted returns")
         
         if abs(max_dd) < 5:
-            st.success(f"最大回撤 {max_dd:.2f}% - 回撤控制良好")
+            st.success(f"Max Drawdown {max_dd:.2f}% - Good drawdown control")
         elif abs(max_dd) < 15:
-            st.warning(f"最大回撤 {max_dd:.2f}% - 回撤适中")
+            st.warning(f"Max Drawdown {max_dd:.2f}% - Moderate drawdown")
         else:
-            st.error(f"最大回撤 {max_dd:.2f}% - 回撤较大，需要注意风险控制")
+            st.error(f"Max Drawdown {max_dd:.2f}% - Large drawdown, need to pay attention to risk control")
 
 def show_frequency_analysis(analyzer, visualizer, interactive):
-    """显示交易频率分析"""
-    st.header("⏰ 交易频率分析")
+    """Display trading frequency analysis"""
+    st.header("⏰ Trading Frequency Analysis")
     
     freq_stats = analyzer.analyze_trading_frequency()
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("频率统计")
+        st.subheader("Frequency Statistics")
         st.json(freq_stats)
     
     with col2:
-        st.subheader("时间分布")
-        if "每小时交易分布" in freq_stats:
-            hourly_data = freq_stats["每小时交易分布"]
-            hourly_df = pd.DataFrame(list(hourly_data.items()), columns=['小时', '交易次数'])
-            st.bar_chart(hourly_df.set_index('小时'))
+        st.subheader("Time Distribution")
+        if "hourly_trade_distribution" in freq_stats:
+            hourly_data = freq_stats["hourly_trade_distribution"]
+            hourly_df = pd.DataFrame(list(hourly_data.items()), columns=['Hour', 'Trade Count'])
+            st.bar_chart(hourly_df.set_index('Hour'))
     
-    # 交易频率图表
-    st.subheader("📅 交易频率图表")
+    # Trading frequency chart
+    st.subheader("📅 Trading Frequency Chart")
     fig = visualizer.plot_trading_frequency()
     if fig:
         st.pyplot(fig)
 
 def show_position_analysis(analyzer, visualizer, interactive):
-    """显示持仓分析"""
-    st.header("📍 持仓分析")
+    """Display position analysis"""
+    st.header("📍 Position Analysis")
     
     position_stats = analyzer.analyze_position_changes()
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("持仓统计")
+        st.subheader("Position Statistics")
         st.json(position_stats)
     
     with col2:
-        st.subheader("持仓分布")
-        if "持仓变化分布" in position_stats:
-            pos_data = position_stats["持仓变化分布"]
-            pos_df = pd.DataFrame(list(pos_data.items()), columns=['持仓类型', '次数'])
-            st.bar_chart(pos_df.set_index('持仓类型'))
+        st.subheader("Position Distribution")
+        if "position_change_distribution" in position_stats:
+            pos_data = position_stats["position_change_distribution"]
+            pos_df = pd.DataFrame(list(pos_data.items()), columns=['Position Type', 'Count'])
+            st.bar_chart(pos_df.set_index('Position Type'))
     
-    # 持仓分析图表
-    st.subheader("📊 持仓分析图表")
+    # Position analysis chart
+    st.subheader("📊 Position Analysis Chart")
     fig = visualizer.plot_position_analysis()
     if fig:
         st.pyplot(fig)
 
 def show_visualization_analysis(visualizer, interactive):
-    """显示可视化分析"""
-    st.header("📈 可视化分析")
+    """Display visualization analysis"""
+    st.header("📈 Visualization Analysis")
     
-    # 价格走势图
-    st.subheader("💹 价格走势")
+    # Price trend chart
+    st.subheader("💹 Price Trend")
     fig = visualizer.plot_price_chart(interactive=interactive)
     if fig:
         if interactive:
@@ -464,8 +464,8 @@ def show_visualization_analysis(visualizer, interactive):
         else:
             st.pyplot(fig)
     
-    # 综合仪表板
-    st.subheader("🎛️ 综合仪表板")
+    # Comprehensive dashboard
+    st.subheader("🎛️ Comprehensive Dashboard")
     fig = visualizer.create_dashboard()
     if fig:
         st.pyplot(fig)
