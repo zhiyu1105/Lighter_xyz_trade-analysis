@@ -1,4 +1,4 @@
-# 📈 交易数据分析框架
+# 📈 Trade Analysis Framework
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -31,99 +31,101 @@
 [![Pull Requests](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](https://github.com/zhiyu1105/Lighter_xyz_trade-analysis/pulls)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-一个功能强大、易于使用的交易数据分析工具，支持多种数据格式，提供全面的交易绩效分析和可视化功能。
+A powerful and easy-to-use trading data analysis tool that supports multiple data formats and provides comprehensive trading performance analysis and visualization capabilities.
 
-## ✨ 主要功能
+**[📖 中文文档](README_CN.md)** | **[📊 在线演示](https://zhiyu1105.github.io/Lighter_xyz_trade-analysis)**
 
-### 🔧 核心功能
-- **多格式数据导入**: 支持 CSV、Excel 格式的交易数据
-- **智能数据清洗**: 自动标准化数据格式，处理缺失值
-- **全面绩效分析**: 盈亏分析、风险指标、回撤分析等
-- **丰富可视化**: 静态图表和交互式图表支持
-- **报告生成**: 一键生成 JSON 格式的综合分析报告
+## ✨ Key Features
 
-### 📊 分析维度
-- **盈亏分析**: 总盈亏、胜率、盈亏比、最大盈利/亏损
-- **风险分析**: 夏普比率、最大回撤、VaR、CVaR
-- **交易频率**: 按时间段分析交易频率和模式
-- **持仓分析**: 多空持仓分布和绩效对比
-- **时间分析**: 交易时间习惯和绩效表现
+### 🔧 Core Features
+- **Multi-format Data Import**: Supports CSV and Excel trading data formats
+- **Smart Data Cleaning**: Automatic data format standardization and missing value handling
+- **Comprehensive Performance Analysis**: P&L analysis, risk metrics, drawdown analysis, etc.
+- **Rich Visualization**: Static charts and interactive chart support
+- **Report Generation**: One-click generation of comprehensive analysis reports in JSON format
 
-### 🎨 可视化图表
-- 累积盈亏曲线
-- 回撤走势图
-- 价格走势与交易点标记
-- 盈亏分布直方图
-- 交易频率热力图
-- 综合分析仪表板
+### 📊 Analysis Dimensions
+- **P&L Analysis**: Total P&L, win rate, profit factor, maximum profit/loss
+- **Risk Analysis**: Sharpe ratio, maximum drawdown, VaR, CVaR
+- **Trading Frequency**: Time-based analysis of trading frequency and patterns
+- **Position Analysis**: Long/short position distribution and performance comparison
+- **Time Analysis**: Trading time habits and performance patterns
 
-## 🚀 快速开始
+### 🎨 Visualization Charts
+- Cumulative P&L curves
+- Drawdown charts
+- Price charts with trade point markers
+- P&L distribution histograms
+- Trading frequency heatmaps
+- Comprehensive analysis dashboard
 
-### 安装依赖
+## 🚀 Quick Start
+
+### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 方法一：网页界面 (推荐)
+### Method 1: Web Interface (Recommended)
 
-启动 Streamlit 应用：
+Launch the Streamlit application:
 
 ```bash
 streamlit run app.py
 ```
 
-然后在浏览器中打开显示的地址（通常是 `http://localhost:8501`）。
+Then open the displayed address in your browser (usually `http://localhost:8501`).
 
-### 方法二：命令行使用
+### Method 2: Command Line Usage
 
-#### 分析示例数据
+#### Analyze Example Data
 ```bash
 python example_analysis.py
 ```
 
-#### 分析自定义文件
+#### Analyze Custom Files
 ```bash
 python example_analysis.py your_trade_data.csv
 ```
 
-### 方法三：代码集成
+### Method 3: Code Integration
 
 ```python
 from trade_analyzer import TradeDataProcessor, TradeAnalyzer, TradeVisualizer
 
-# 加载数据
+# Load data
 processor = TradeDataProcessor()
 data = processor.load_csv('your_trade_data.csv')
 
-# 分析
+# Analysis
 analyzer = TradeAnalyzer(data)
 pnl_stats = analyzer.calculate_pnl_statistics()
 risk_metrics = analyzer.calculate_risk_metrics()
 
-# 可视化
+# Visualization
 visualizer = TradeVisualizer(data)
 fig = visualizer.plot_pnl_curve()
 visualizer.save_all_charts('output_charts')
 ```
 
-## 📁 数据格式要求
+## 📁 Data Format Requirements
 
-你的交易数据文件应包含以下列（列名不区分大小写）：
+Your trading data file should contain the following columns (column names are case-insensitive):
 
-| 列名 | 说明 | 必需性 | 示例 |
-|------|------|--------|------|
-| Market | 市场/品种 | 可选 | BTC, ETH, AAPL |
-| Side | 交易方向 | 可选 | Long, Short, Long > Short |
-| Date | 交易日期时间 | **必需** | 2025-01-01 10:30:00 |
-| Trade Value | 交易价值 | 可选 | 1000.50 |
-| Size | 交易数量 | 可选 | 0.001 |
-| Price | 交易价格 | 可选 | 50000.0 |
-| Closed PnL | 已实现盈亏 | **必需** | 15.25, -8.50 |
-| Fee | 手续费 | 可选 | 2.0 |
-| Role | 角色 | 可选 | Maker, Taker |
+| Column Name | Description | Required | Example |
+|-------------|-------------|----------|---------|
+| Market | Market/Instrument | Optional | BTC, ETH, AAPL |
+| Side | Trade Direction | Optional | Long, Short, Long > Short |
+| Date | Trade Date/Time | **Required** | 2025-01-01 10:30:00 |
+| Trade Value | Trade Value | Optional | 1000.50 |
+| Size | Trade Size | Optional | 0.001 |
+| Price | Trade Price | Optional | 50000.0 |
+| Closed PnL | Realized P&L | **Required** | 15.25, -8.50 |
+| Fee | Transaction Fee | Optional | 2.0 |
+| Role | Role | Optional | Maker, Taker |
 
-### 数据示例
+### Data Example
 
 ```csv
 Market,Side,Date,Trade Value,Size,Price,Closed PnL,Fee,Role,Type
@@ -131,125 +133,126 @@ BTC,Long > Short,2025-01-01 10:30:00,1000.5,0.001,50000,15.25,2.0,Taker,trade
 BTC,Short > Long,2025-01-01 11:15:00,980.3,0.001,49015,-8.50,2.0,Taker,trade
 ```
 
-## 🏗️ 项目结构
+## 🏗️ Project Structure
 
 ```
 TradeAnalysis/
-├── trade_analyzer/              # 核心分析包
-│   ├── __init__.py             # 包初始化
-│   ├── data_processor.py       # 数据处理模块
-│   ├── analyzer.py             # 分析计算模块
-│   └── visualizer.py           # 可视化模块
-├── app.py                      # Streamlit 网页应用
-├── example_analysis.py         # 命令行示例脚本
-├── requirements.txt            # 依赖列表
-├── README.md                  # 项目文档
-└── lighter-trade-export-*.csv  # 示例数据文件
+├── trade_analyzer/              # Core analysis package
+│   ├── __init__.py             # Package initialization
+│   ├── data_processor.py       # Data processing module
+│   ├── analyzer.py             # Analysis calculation module
+│   └── visualizer.py           # Visualization module
+├── app.py                      # Streamlit web application
+├── example_analysis.py         # Command line example script
+├── requirements.txt            # Dependency list
+├── README.md                  # Project documentation (English)
+├── README_CN.md               # Project documentation (Chinese)
+└── lighter-trade-export-*.csv  # Example data files
 ```
 
-## 📊 分析指标说明
+## 📊 Analysis Metrics
 
-### 盈亏指标
-- **总盈亏**: 所有交易的盈亏总和
-- **胜率**: 盈利交易占总交易的百分比
-- **盈亏比**: 平均盈利与平均亏损的比值
-- **夏普比率**: 风险调整后的收益率指标
+### P&L Metrics
+- **Total P&L**: Sum of all trade P&L
+- **Win Rate**: Percentage of profitable trades
+- **Profit Factor**: Ratio of average profit to average loss
+- **Sharpe Ratio**: Risk-adjusted return metric
 
-### 风险指标
-- **最大回撤**: 从历史最高点到最低点的最大损失
-- **VaR (Value at Risk)**: 在一定置信度下的最大可能损失
-- **CVaR (条件VaR)**: 超过VaR阈值的平均损失
+### Risk Metrics
+- **Maximum Drawdown**: Maximum loss from historical peak to trough
+- **VaR (Value at Risk)**: Maximum potential loss at a given confidence level
+- **CVaR (Conditional VaR)**: Average loss exceeding VaR threshold
 
-### 交易频率指标
-- **日均交易次数**: 平均每天的交易频率
-- **最活跃时段**: 交易最频繁的时间段
-- **交易分布**: 按时间维度的交易分布情况
+### Trading Frequency Metrics
+- **Daily Trading Frequency**: Average daily trading frequency
+- **Most Active Periods**: Time periods with highest trading frequency
+- **Trading Distribution**: Trading distribution by time dimension
 
-## 🎯 使用场景
+## 🎯 Use Cases
 
-### 个人交易者
-- 分析个人交易记录
-- 评估交易策略效果
-- 识别交易习惯和模式
-- 风险管理和控制
+### Individual Traders
+- Analyze personal trading records
+- Evaluate trading strategy effectiveness
+- Identify trading habits and patterns
+- Risk management and control
 
-### 策略开发
-- 回测交易策略
-- 比较不同策略表现
-- 优化交易参数
-- 风险收益分析
+### Strategy Development
+- Backtest trading strategies
+- Compare different strategy performance
+- Optimize trading parameters
+- Risk-return analysis
 
-### 投资机构
-- 交易员绩效评估
-- 风险监控和管理
-- 合规报告生成
-- 投资组合分析
+### Investment Institutions
+- Trader performance evaluation
+- Risk monitoring and management
+- Compliance report generation
+- Portfolio analysis
 
-## 🛠️ 自定义扩展
+## 🛠️ Custom Extensions
 
-### 添加新的分析指标
+### Adding New Analysis Metrics
 
 ```python
 class CustomAnalyzer(TradeAnalyzer):
     def calculate_custom_metric(self):
-        # 你的自定义计算逻辑
+        # Your custom calculation logic
         return custom_result
 ```
 
-### 自定义可视化
+### Custom Visualization
 
 ```python
 class CustomVisualizer(TradeVisualizer):
     def plot_custom_chart(self):
-        # 你的自定义图表逻辑
+        # Your custom chart logic
         return fig
 ```
 
-## 📈 性能优化
+## 📈 Performance Optimization
 
-- 对于大数据集（>100万条记录），建议使用数据过滤功能
-- 生成图表时可选择静态图表以提高速度
-- 可通过并行处理优化多文件分析
+- For large datasets (>1M records), use data filtering features
+- Choose static charts for faster chart generation
+- Optimize multi-file analysis through parallel processing
 
-## 🤝 贡献指南
+## 🤝 Contributing
 
-欢迎提交 Issue 和 Pull Request！
+Welcome to submit Issues and Pull Requests!
 
-1. Fork 本仓库
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 提交 Pull Request
+1. Fork this repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Submit a Pull Request
 
-## 📄 许可证
+## 📄 License
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
-## 🆘 常见问题
+## 🆘 FAQ
 
-### Q: 支持哪些数据格式？
-A: 目前支持 CSV 和 Excel (.xlsx, .xls) 格式。
+### Q: What data formats are supported?
+A: Currently supports CSV and Excel (.xlsx, .xls) formats.
 
-### Q: 如何处理缺失的列？
-A: 框架会自动处理缺失列，只有 Date 和 Closed PnL 是必需的。
+### Q: How to handle missing columns?
+A: The framework automatically handles missing columns, only Date and Closed PnL are required.
 
-### Q: 可以分析加密货币以外的交易数据吗？
-A: 可以，框架支持任何类型的交易数据（股票、期货、外汇等）。
+### Q: Can I analyze trading data other than cryptocurrencies?
+A: Yes, the framework supports any type of trading data (stocks, futures, forex, etc.).
 
-### Q: 如何自定义分析指标？
-A: 可以继承 TradeAnalyzer 类并添加自己的分析方法。
+### Q: How to customize analysis metrics?
+A: You can inherit from the TradeAnalyzer class and add your own analysis methods.
 
-### Q: 生成的图表可以保存吗？
-A: 可以，支持保存为 PNG 格式，或使用交互式图表。
+### Q: Can generated charts be saved?
+A: Yes, supports saving as PNG format or using interactive charts.
 
-## 📞 支持
+## 📞 Support
 
-如果你在使用过程中遇到问题，可以：
+If you encounter issues during use:
 
-1. 查看项目 Issues
-2. 提交新的 Issue 描述问题
-3. 查看示例代码和文档
+1. Check project Issues
+2. Submit a new Issue describing the problem
+3. Check example code and documentation
 
 ---
 
-**�� 开始你的交易数据分析之旅吧！** 
+**🚀 Start your trading data analysis journey!** 
